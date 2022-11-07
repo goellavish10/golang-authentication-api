@@ -436,6 +436,10 @@ func (fn tileAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type responseDjango struct {
+	Status bool `json:"status"`
+}
+
 /******************************************************************************/
 func checkMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -447,7 +451,7 @@ func checkMiddleware(next http.Handler) http.Handler {
 			w.Write([]byte("Malformed Token"))
 		} else {
 			jwtToken := authHeader[1]
-			c := http.Client{Timeout: time.Duration(3) * time.Second}
+			c := http.Client{Timeout: time.Duration(500) * time.Second}
 
 			req, err := http.NewRequest("GET", "https://njcannibis.herokuapp.com/accounts/verify-jwt/", nil)
 
@@ -469,11 +473,18 @@ func checkMiddleware(next http.Handler) http.Handler {
 			if err != nil {
 				log.Fatal(err)
 			}
+			var response responseDjango
+			json.Unmarshal(body, &response)
 
-			respBody := string(body)
+			fmt.Println(response)
 
-			fmt.Println(respBody)
-			// next.ServeHTTP(w, r.WithContext())
+			if response.Status {
+				next.ServeHTTP(w, r)
+			} else {
+				fmt.Println("Unauthorized")
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte("Unauthorized"))
+			}
 		}
 	})
 }
