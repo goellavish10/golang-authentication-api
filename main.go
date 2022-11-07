@@ -514,16 +514,16 @@ func tileRouter() *mux.Router {
 
 	// Front page and layer list
 	r.Handle("/", checkMiddleware(tileAppHandler(requestListHTML)))
-	r.Handle("/index.html", tileAppHandler(requestListHTML))
-	r.Handle("/index.json", tileAppHandler(requestListJSON))
+	r.Handle("/index.html", checkMiddleware(tileAppHandler(requestListHTML)))
+	r.Handle("/index.json", checkMiddleware(tileAppHandler(requestListJSON)))
 	// Layer detail and demo pages
-	r.Handle("/{name}.html", tileAppHandler(requestPreview))
-	r.Handle("/{name}.json", tileAppHandler(requestDetailJSON))
+	r.Handle("/{name}.html", checkMiddleware(tileAppHandler(requestPreview)))
+	r.Handle("/{name}.json", checkMiddleware(tileAppHandler(requestDetailJSON)))
 	// Tile requests
-	r.Handle("/{name}/{z:[0-9]+}/{x:[0-9]+}/{y:[0-9]+}.{ext}", tileMetrics(tileAppHandler(requestTiles)))
+	r.Handle("/{name}/{z:[0-9]+}/{x:[0-9]+}/{y:[0-9]+}.{ext}", checkMiddleware(tileMetrics(tileAppHandler(requestTiles))))
 
 	if viper.GetBool("EnableMetrics") {
-		r.Handle("/metrics", promhttp.Handler())
+		r.Handle("/metrics", checkMiddleware(promhttp.Handler()))
 	}
 	return r
 }
