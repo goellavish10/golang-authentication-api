@@ -88,7 +88,7 @@ func init() {
 	viper.SetDefault("DbPoolMaxConnLifeTime", "1h")
 	viper.SetDefault("DbPoolMaxConns", 4)
 	viper.SetDefault("DbTimeout", 10)
-	viper.SetDefault("CORSOrigins", []string{"*"})
+	viper.SetDefault("CORSOrigins", []string{"https://njcannibis.herokuapp.com"})
 	viper.SetDefault("BasePath", "/")
 	viper.SetDefault("CacheTTL", 0)          // cache timeout in seconds
 	viper.SetDefault("EnableMetrics", false) // Prometheus metrics
@@ -409,11 +409,12 @@ type tileAppHandler func(w http.ResponseWriter, r *http.Request) error
 // as well as returning HTTP error response codes on failure
 // so clients can see what is going on
 // TODO: return JSON document body for the HTTP error
-func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-}
+//
+//	func enableCors(w *http.ResponseWriter) {
+//		(*w).Header().Set("Access-Control-Allow-Origin", "*")
+//	}
 func (fn tileAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	enableCors(&w)
+	// enableCors(&w)
 	log.WithFields(log.Fields{
 		"method": r.Method,
 		"url":    r.URL,
@@ -449,7 +450,7 @@ func checkMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// do something
 		authHeader := strings.Split(r.Header.Get("Authorization"), "Basic ")
-		fmt.Println(r.Header.Get("Authorization"))
+		// fmt.Println()
 		if len(authHeader) != 2 {
 			fmt.Println("Malformed token")
 			w.WriteHeader(http.StatusUnauthorized)
