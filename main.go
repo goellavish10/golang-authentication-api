@@ -449,6 +449,7 @@ func checkMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// do something
 		authHeader := strings.Split(r.Header.Get("Authorization"), "Basic ")
+		fmt.Println(r.Header.Get("Authorization"))
 		if len(authHeader) != 2 {
 			fmt.Println("Malformed token")
 			w.WriteHeader(http.StatusUnauthorized)
