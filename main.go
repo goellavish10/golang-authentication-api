@@ -409,7 +409,11 @@ type tileAppHandler func(w http.ResponseWriter, r *http.Request) error
 // as well as returning HTTP error response codes on failure
 // so clients can see what is going on
 // TODO: return JSON document body for the HTTP error
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
 func (fn tileAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	log.WithFields(log.Fields{
 		"method": r.Method,
 		"url":    r.URL,
